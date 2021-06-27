@@ -15,6 +15,7 @@ def write2excel(company_info,search_keyword,index):
     excel_table.write(index,12,company_info['统一信用代码'])
     excel_table.write(index,3,search_keyword)   # 公司名
     excel_table.write(index,0,index)   # 序号
+    excel_table.write(index,16,company_info['住所'])   # 住所
 
 
 

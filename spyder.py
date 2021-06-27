@@ -34,8 +34,8 @@ def get_company_info(search_url):
 
     searchTxt = response.decode('utf-8')
 
-    with open('./test.txt', 'w') as file:
-        file.write(searchTxt)
+    # with open('./test.txt', 'w') as file:
+    #     file.write(searchTxt)
 
     match = pattern_faren.findall(response.decode('utf-8'))
 
@@ -91,6 +91,16 @@ def get_company_info(search_url):
 
     if len(match) > 0:
         info['财务负责人'] = match[0]
+
+    # 住所
+
+    pattern_cType = re.compile(r'''<tr><td class="tb">注册地址</td> <td colspan="5"><a class="text-dk">(.*)</a> <a hre''', re.MULTILINE)
+
+    match = pattern_cType.findall(response.decode('utf-8'))
+
+
+    if len(match) > 0:
+        info['住所'] = match[0]
 
     # 统一信用代码
 
