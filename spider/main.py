@@ -11,7 +11,7 @@ from spyder import get_company_info
 from write2excel import write2excel
 
 
-companies = ['西安致康医疗供应链管理有限公司', '山东致新医疗供应链管理有限公司', '建发德尔（西安）医疗科技有限公司', '贵州致新康德医疗供应链管理有限公司']
+companies = ['西安致康医疗供应链管理有限公司']
 
 class QCC(object):
     """企查查爬虫"""
@@ -33,15 +33,17 @@ class QCC(object):
     def search(self, search_keyword,index):
         """搜索"""
         url = 'https://www.qcc.com/web/search?key={}'.format(search_keyword)
+        print(url)
         headers = self._headers
         headers['cookie'] = 'acw_tc={}'.format(self.get_cookie())
         response = requests.get(url, headers=headers)
         response.encoding = 'utf8'
         html = etree.HTML(response.text)
-        com_url = html.xpath('//a[@class="title"]/@href')
+        print(html)
+        com_url = html.xpath('//a[@class="title copy-value"]/@href')
         # print('搜索到{}条结果。即将开始获取详细信息...'.format(len(com_url)))
         for url in com_url:
-            # print(url)
+            print(url, '111111')
             company_info = get_company_info(url)
             write2excel(company_info,search_keyword,index)
             return

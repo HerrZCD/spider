@@ -18,17 +18,19 @@ def get_company_info(search_url):
 
     #url="https://www.qcc.com/firm/c19ffeab8bff6a23afb7bc8521c33139.html"
 
+    print(search_url)
+
 
     request=urllib.request.Request(search_url,headers=headers)
 
     #Request对象作为urlopen()方法的参数，发送给服务器并接收响应
     #在urlopen()方法里 指明添加 context 参数
     response=urllib.request.urlopen(request,context=context).read()
-    # print(response.decode('utf-8'))
+    #  print(response.decode('utf-8'))
 
 
     # 寻找法人
-    rawPattern_faren = r'class="tb">法定代表人</td>.*target="_blank">(.*)</a></span> <!----> <a class="war-link">关联'
+    rawPattern_faren = r'<span class="val"><span class="max-130"><span><a href=".*" target="_blank">(.*)</a></span></span>'
 
     pattern_faren = re.compile(rawPattern_faren, re.MULTILINE)
 
@@ -48,7 +50,7 @@ def get_company_info(search_url):
 
     # 企业类型
 
-    pattern_cType = re.compile(r'企业类型</td> <td>(.*)</td> <td class="tb">', re.MULTILINE)
+    pattern_cType = re.compile(r'</td> <td>(.*)</td> <td class="tb">营业期限', re.MULTILINE)
 
     match = pattern_cType.findall(response.decode('utf-8'))
 
@@ -68,7 +70,7 @@ def get_company_info(search_url):
     # print(sub_search_area)
 
     # 搜索董事
-    pattern_cType = re.compile(r'<td style="text-align:left;"><div class="td-coy"><span class="headimg"><span class="app-auto-logo" style="width:40px;height:40px;"><span style="font-size:18px;line-height:39px;width:40px;height:40px;border-radius:4px;background-color:#E79177;">.*</span></span></span> <span class="cont"><span class="name"><a href=".*" target="_blank">(.*?)</a></span>.*<span>.*董事.*</span></td><td>', re.MULTILINE)
+    pattern_cType = re.compile(r'</td> <td class="left"><div class="td-coy"><span class="headimg"><span class="app-auto-logo" style="width:40px;height:40px;"><span style="font-size:18px;line-height:39px;width:40px;height:40px;border-radius:4px;background-color:#E79177;">.*</span></span></span> <span class="cont"><span class="name"><a href=".*" target="_blank">(.*)</a></span>.*</span> <span class="foot"><a class="war-link"><i aria-label="icon.*" class="anticon anticon-icon-icon_guanlianqiye aicon aicon-guanlianqiye"><svg width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false"><use xlink:href=".*"></use></svg></i> <span>关联.*家企业 &gt;</span></a></span> </div></td><td><span>.*董事.*</span></td><td class="filter-blur"><div>.*</div></td><td class="filter-blur"><div>.*</div></td></tr> <tr> <td class="tx">', re.MULTILINE)
 
     match = pattern_cType.findall(response.decode('utf-8'))
 
@@ -76,7 +78,7 @@ def get_company_info(search_url):
 
     # 监事
 
-    pattern_cType = re.compile(r'<td style="text-align:left;"><div class="td-coy"><span class="headimg"><span class="app-auto-logo" style="width:40px;height:40px;"><span style="font-size:18px;line-height:39px;width:40px;height:40px;border-radius:4px;background-color:#E79177;">.*</span></span></span> <span class="cont"><span class="name"><a href=".*" target="_blank">(.*?)</a></span>.*<span>监事.*</span></td><td>', re.MULTILINE)
+    pattern_cType = re.compile(r'<em>姓名: <a href=".*" target="_blank">(.*?)</a>; 证件号码: .*; 职位.*监事.*</em></span>', re.MULTILINE)
 
     match = pattern_cType.findall(response.decode('utf-8'))
 
@@ -84,7 +86,7 @@ def get_company_info(search_url):
 
     #财务负责人
 
-    pattern_cType = re.compile(r'<td style="text-align:left;"><div class="td-coy"><span class="headimg"><span class="app-auto-logo" style="width:40px;height:40px;"><span style="font-size:18px;line-height:39px;width:40px;height:40px;border-radius:4px;background-color:#E79177;">.*</span></span></span> <span class="cont"><span class="name"><a href=".*" target="_blank">(.*?)</a></span>.*<span>财务负责人.*</span></td><td>', re.MULTILINE)
+    pattern_cType = re.compile(r'<em>现</em>财务负责人姓名:<em>(.*)\,.*</em>财务负责人固定电话', re.MULTILINE)
 
     match = pattern_cType.findall(response.decode('utf-8'))
 
@@ -94,20 +96,19 @@ def get_company_info(search_url):
 
     # 统一信用代码
 
-    pattern_cType = re.compile(r'''</a></span> <span class="f">
-                  统一社会信用代码：
-                  <span class="val">
-                    (.*)
-                  </span></span></div> <div class="rline"><span class="f ca">''', re.MULTILINE)
+    pattern_cType = re.compile(r'''统一社会信用代码：
+                  <span class="val"><div class="app-copy-box copy-hover-item" data-v-.*><span class="copy-value" data-v-.*>(.*)</span> <span class="app-copy copy-button-item"''', re.MULTILINE)
 
     match = pattern_cType.findall(response.decode('utf-8'))
 
     if len(match) > 0:
         info['统一信用代码'] = match[0]
 
+    print(match, '------')
+
     # 成立日期
 
-    pattern_cType = re.compile(r'''<td width="13%" class="tb">成立日期</td> <td width="20%">(.*)</td></tr> <tr><td class="tb">注册资本</td>''', re.MULTILINE)
+    pattern_cType = re.compile(r'class="tb">成立日期 <i aria-label=".*" class=".*"><svg width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false"><use xlink:href=".*"></use></svg></i></td> <td width="20%">(.*)</td></tr> <tr><', re.MULTILINE)
 
     match = pattern_cType.findall(response.decode('utf-8'))
 
